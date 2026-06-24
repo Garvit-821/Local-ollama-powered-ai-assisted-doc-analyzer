@@ -8,6 +8,7 @@ Local document Q&A tool. Upload a file, ask questions, get answers grounded in t
 
 **Branch:** `user-interface` (current web UI)  
 **Repo:** [Garvit-821/Local-ollama-powered-ai-assisted-doc-analyzer](https://github.com/Garvit-821/Local-ollama-powered-ai-assisted-doc-analyzer)
+
 ---
 
 ## Table of Contents
