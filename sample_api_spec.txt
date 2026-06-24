@@ -1,0 +1,90 @@
+LOCAL-CORTEX API SPECIFICATION
+Version: 1.2.0
+Last Updated: 2026-03-15
+Author: Platform Engineering Team
+
+OVERVIEW
+Local-Cortex is a local document analysis service. All endpoints run on a single FastAPI
+instance bound to 127.0.0.1:8000 by default. The service keeps one active document in
+memory per server process. There is no authentication layer in v1.
+
+SUPPORTED UPLOAD FORMATS
+- Plain text (.txt)
+- Markdown (.md, .markdown)
+- PDF (.pdf) — text extracted via pypdf
+- Word (.docx) — paragraph text extracted via python-docx
+
+Maximum recommended upload size: 5 MB per file.
+Files larger than 5 MB may cause slow indexing on machines with 8 GB RAM.
+
+ENDPOINTS
+
+GET /api/document
+Returns the currently loaded document and parsing metrics.
+Response when empty: {"status": "empty"}
+Response when loaded: filename, content, metrics (chars, words, lines, chunks)
+
+POST /api/upload
+Content-Type: multipart/form-data
+Field name: file
+On success returns status, filename, and metrics.
+On failure returns HTTP 400 for unsupported extensions or HTTP 500 for parse errors.
+
+POST /api/chat
+Content-Type: application/json
+Body fields:
+  message (string, required) — the user's question
+  history (array, optional) — prior turns, max 6 messages retained server-side
+Response: text/event-stream (SSE)
+First event: metadata with matched chunk line ranges
+Following events: token stream
+Final event: [DONE]
+
+POST /api/clear
+Resets document state, TF-IDF index, and metrics.
+Does not clear browser-side chat history unless the client reloads.
+
+RETRIEVAL RULES
+Documents under 6,000 characters: full text is sent to the language model.
+Documents 6,000 characters or larger: top 3 TF-IDF chunks are sent to the model.
+Chunk size: approximately 1,000 characters with 200-character line overlap.
+Line numbers in citations are 1-indexed.
+
+DEFAULT MODEL SETTINGS
+Model: qwen2.5:3b (via Ollama)
+Temperature: 0.3
+Max output tokens (num_predict): 512
+Ollama base URL: http://localhost:11434
+
+HARDWARE REQUIREMENTS (TESTED)
+Minimum RAM: 8 GB
+Recommended GPU: NVIDIA with 4 GB VRAM (e.g. RTX 3050)
+CPU-only inference is supported but responses will be slower.
+Disk space for model weights: approximately 2 GB for qwen2.5:3b
+
+DEPLOYMENT NOTES
+1. Ollama must be running before chat requests will succeed.
+2. The server should not be exposed to public networks without adding auth.
+3. CORS is set to allow all origins for local development only.
+4. Static assets are served from the /static directory mounted at /.
+
+ERROR CODES
+400 — No document loaded (chat), or unsupported file type (upload)
+500 — File decode or indexing failure
+
+INCIDENT CONTACTS
+Primary on-call: devops@internal.example.com
+Escalation: platform-lead@internal.example.com
+Status page: https://status.internal.example.com
+
+CHANGELOG (v1.2.0)
+- Added PDF and DOCX upload support
+- Migrated frontend from Streamlit to FastAPI + vanilla JS
+- Added SSE streaming for chat responses
+- Added line-level citation metadata in stream
+
+KNOWN LIMITATIONS
+- Single document per server instance
+- No persistence across restarts
+- TF-IDF retrieval is keyword-based, not semantic
+- Chat history is not stored server-side between sessions
