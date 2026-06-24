@@ -629,7 +629,6 @@ This is a local dev tool, not something to expose on a public network as-is.
 - [ ] Multiple documents per session
 - [ ] Export chat history
 - [ ] Model picker in the UI
-- [ ] `requirements.txt`
 - [ ] Docker setup
 - [ ] Tests for chunking and TF-IDF
 - [ ] Mobile layout
