@@ -822,8 +822,8 @@ flowchart LR
 
 Thank you to the following people who have contributed to this project:
 
-- **[RUDRA-PRATAP-SINGH01](https://github.com/RUDRA-PRATAP-SINGH01)** — Major documentation rewrite, architecture mapping, and README overhaul.
-## License
+- **[RUDRA-PRATAP-SINGH01](https://github.com/RUDRA-PRATAP-SINGH01)** — Major documentation rewrite and complete README overhaul, including architecture diagrams, API documentation, installation guides, and technical documentation. Also contributed backend reliability improvements by resolving a race condition that could interleave streamed tokens when switching chat agents mid-response, and implementing per-agent context budget management with automatic chat-history trimming to prevent context-window overflows when switching between models with different context limits.
+
 
 MIT License — see [LICENSE](LICENSE).
 
